@@ -1,0 +1,18 @@
+Inention: einfach und schnell neuen Reminders anlegen. Die Reminders werden über die App
+nur hinzugefügt, das abhaken passiert über die Reminders App
+
+
+
+Friseur               heute 11:00                    -- alle hinzugefügten Einträge
+Einkaufen                Sa 11:00                    -- der zuletzt hinzugefügte kommt zuletzt
+                                                     -- Liste ist scrollbar und scrollt beim
+                                                     -- Hinzufügen mit.
+
+
+
+
+[heute] [morgen] [Fr] [Sa] [So] [Mo]     [>>]       -- heute und morgen + die Tage ums WE
+[7:00] [11:00] [15:00] [19:00] [22:00]
+
+
+______________________________    [Add]

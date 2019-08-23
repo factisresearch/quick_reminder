@@ -10,8 +10,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var title = "Quick Reminder";
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: title,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: title),
     );
   }
 }
@@ -104,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListWidget(
                 entries: _entries,
                 scrollController: _scrollController,
-                deleteCallback: _deleteEntry)
+                deleteCallback: _deleteEntry),
             ),
             const SizedBox(height: 10),
             Input(

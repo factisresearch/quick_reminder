@@ -1,10 +1,32 @@
 import 'package:flutter/material.dart';
 import "./types.dart";
+import 'package:intl/intl.dart';
 import 'package:kt_dart/collection.dart';
 
 const double itemHeight = 30;
 
 typedef void ListWidgetDeleteCallback(int idx);
+
+final dateFormatter = new DateFormat('dd.MM.yyyy');
+
+String formatDate(DateTime t, Day today) {
+  final day = Day.fromDateTime(t);
+  if (day == today) {
+    return "heute";
+  } else if (day == today.addDays(1)) {
+    return "morgen";
+  } else {
+    return dateFormatter.format(t);
+  }
+}
+
+final timeFormatter = new DateFormat("HH:mm");
+
+String formatDateTime(DateTime t, Day today) {
+  final date = formatDate(t, today);
+  final time = timeFormatter.format(t) + " Uhr";
+  return date + ", " + time;
+}
 
 class ListWidget extends StatelessWidget {
 
@@ -21,12 +43,20 @@ class ListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var today = Day.today();
     var w = ListView.builder(
       controller: scrollController,
       scrollDirection: Axis.vertical,
       itemCount: entries.size ,
       itemBuilder: (context, idx) {
-        var item = entries[idx];
+        final item = entries[idx];
+        var title = item.title;
+        final tOpt = item.dateTime;
+        if (tOpt.hasValue()) {
+          final t = tOpt.getValue();
+          final fmt = formatDateTime(t, today);
+          title = title + " (" + fmt + ")";
+        }
         return Container(
           height: itemHeight,
           padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
@@ -40,9 +70,7 @@ class ListWidget extends StatelessWidget {
                     deleteCallback(idx);
                   }
                 ),
-                Text(
-                  item.title + " (" + item.dateTime.toString() + ")"
-                )
+                Text(title)
               ]
             )
         );

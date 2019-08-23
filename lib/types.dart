@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 class ReminderEntry {
   final String title;
@@ -70,8 +71,13 @@ class Option<T> {
 }
 
 class Day {
+  static Day today() {
+    return Day.fromDateTime(DateTime.now());
+  }
+
   Day.fromDateTime(DateTime t)
     : year = t.year, month = t.month, day = t.day;
+
 
   final int year;
   final int month;
@@ -91,5 +97,16 @@ class Day {
       return DateTime(year, month, day);
     }
   }
+
+  @override
+  bool operator ==(dynamic other) {
+    if (other is! Day) return false;
+    final Day typedOther = other;
+    return year == typedOther.year && month == typedOther.month && day == typedOther.day;
+  }
+
+  @override
+  int get hashCode => hashValues(year, month, day);
+
 }
 

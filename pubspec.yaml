@@ -29,6 +29,7 @@ dependencies:
     path: ../flutter_datetime_picker
   build_runner: ^0.9.0
   kt_dart: ^0.6.2
+  intl: ^0.15.8
 
 dev_dependencies:
   flutter_test:

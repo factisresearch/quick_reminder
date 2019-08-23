@@ -64,6 +64,8 @@ class _Input extends State<Input> {
   final FocusNode focusNode = FocusNode();
 
   final List<Pair<String, Day>> dayButtons = makeDayList();
+  final defaultDayIndesx = 0;
+
   final List<Pair<String, TimeOfDay>> timeButtons =
     [
       Pair("7:00", TimeOfDay(hour: 7, minute: 0)),
@@ -72,6 +74,8 @@ class _Input extends State<Input> {
       Pair("19:00", TimeOfDay(hour: 19, minute: 0)),
       Pair("22:00", TimeOfDay(hour: 22, minute: 0))
     ];
+  final defaultTimeIndex = 1;
+
   final InputCallback callback;
 
   _Input(this.callback);
@@ -89,9 +93,9 @@ class _Input extends State<Input> {
   Option<DateTime> getDateTime() {
     if (_explicitedDateTime != null) {
       return some(_explicitedDateTime);
-    } else if (_selectedDayIndex >= 0 && _selectedTimeIndex >= 0) {
-      var day = dayButtons[_selectedDayIndex].snd;
-      var time = timeButtons[_selectedTimeIndex].snd;
+    } else if (_selectedDayIndex >= 0 || _selectedTimeIndex >= 0) {
+      var day = dayButtons[_selectedDayIndex < 0 ? defaultDayIndesx : _selectedDayIndex].snd;
+      var time = timeButtons[_selectedTimeIndex < 0 ? defaultTimeIndex : _selectedTimeIndex].snd;
       return some(day.toDateTime(time));
     } else {
       return none();

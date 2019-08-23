@@ -107,8 +107,17 @@ class _Input extends State<Input> {
   @override
   Widget build(BuildContext context) {
     Widget quickButtonsOrText;
+    final today = Day.today();
+    const buttonGroupSpacing = 12.0;
     if (_explicitedDateTime != null) {
-      quickButtonsOrText = Text(_explicitedDateTime.toString());
+      quickButtonsOrText =
+        Container(
+          height: 2 * buttonHeight + buttonGroupSpacing,
+          padding: buttonPadding,
+          margin: buttonMargin,
+          alignment: Alignment.center,
+          child: Text(formatDateTime(_explicitedDateTime, today))
+        );
     } else {
       quickButtonsOrText =
         Column(
@@ -125,13 +134,12 @@ class _Input extends State<Input> {
                     _selectedDayIndex = -1;
                   }
                 });
-                print("Button $index is now ${enabled ? 'enabled' : 'disabled'}");
               },
               buttonAttributes: dayButtons.map((p) {
                 return new ButtonAttributes(text: p.fst);
               }).toList()
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: buttonGroupSpacing),
             ButtonGroup(
               selectedIndex: this._selectedTimeIndex,
               callback: (index, enabled) {
@@ -142,7 +150,6 @@ class _Input extends State<Input> {
                     _selectedTimeIndex = -1;
                   }
                 });
-                print("Button $index is now ${enabled ? 'enabled' : 'disabled'}");
               },
               buttonAttributes: timeButtons.map((p) {
                 return new ButtonAttributes(text: p.fst);
@@ -159,11 +166,15 @@ class _Input extends State<Input> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            quickButtonsOrText,
+            Expanded(child: quickButtonsOrText),
             const SizedBox(width: 20),
-            Button(
-              buttonAttributes: new ButtonAttributes(text: ">>"),
-              callback: (bool enabled) async {
+            GestureDetector(
+              child: Container(
+                height: buttonHeight,
+                margin: const EdgeInsets.symmetric(horizontal: 9.0),
+                child: Icon(Icons.date_range, size: buttonHeight * 0.9)
+              ),
+              onTap: () async {
                 setState(() {
                   _textFocused = false;
                 });
@@ -182,8 +193,8 @@ class _Input extends State<Input> {
                 setState(() {
                   _textFocused = true;
                 });
-              },
-            )
+              }
+            ),
           ]
         ),
         const SizedBox(height: 12),
@@ -204,7 +215,10 @@ class _Input extends State<Input> {
             ),
             FloatingActionButton(
               onPressed: () {
-                var title = _controller.text;
+                var title = _controller.text.trim();
+                if (title == "") {
+                  return;
+                }
                 var entry = new ReminderEntry(title, getDateTime());
                 setState(() {
                   _explicitedDateTime = null;

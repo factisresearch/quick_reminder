@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+const buttonHeight = 36.0;
+const buttonPadding = const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0);
+const buttonMargin = const EdgeInsets.symmetric(horizontal: 5.0);
+
 class ButtonAttributes {
   final String text;
   ButtonAttributes({@required this.text});
@@ -11,9 +15,9 @@ Widget renderButton(ButtonAttributes attrs, StatelessButtonCallback cb, bool ena
     return GestureDetector(
       onTap: cb,
       child: Container(
-        height: 36.0,
-        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+        height: buttonHeight,
+        padding: buttonPadding,
+        margin: buttonMargin,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5.0),
           color: bgColor,

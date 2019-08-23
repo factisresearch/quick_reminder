@@ -1,32 +1,10 @@
 import 'package:flutter/material.dart';
 import "./types.dart";
-import 'package:intl/intl.dart';
 import 'package:kt_dart/collection.dart';
 
 const double itemHeight = 30;
 
 typedef void ListWidgetDeleteCallback(int idx);
-
-final dateFormatter = new DateFormat('dd.MM.yyyy');
-
-String formatDate(DateTime t, Day today) {
-  final day = Day.fromDateTime(t);
-  if (day == today) {
-    return "heute";
-  } else if (day == today.addDays(1)) {
-    return "morgen";
-  } else {
-    return dateFormatter.format(t);
-  }
-}
-
-final timeFormatter = new DateFormat("HH:mm");
-
-String formatDateTime(DateTime t, Day today) {
-  final date = formatDate(t, today);
-  final time = timeFormatter.format(t) + " Uhr";
-  return date + ", " + time;
-}
 
 class ListWidget extends StatelessWidget {
 

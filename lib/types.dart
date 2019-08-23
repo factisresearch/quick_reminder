@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
+import 'package:intl/intl.dart';
 
 class ReminderEntry {
   final String title;
@@ -108,5 +108,26 @@ class Day {
   @override
   int get hashCode => hashValues(year, month, day);
 
+}
+
+final dateFormatter = new DateFormat('dd.MM.yyyy');
+
+String formatDate(DateTime t, Day today) {
+  final day = Day.fromDateTime(t);
+  if (day == today) {
+    return "heute";
+  } else if (day == today.addDays(1)) {
+    return "morgen";
+  } else {
+    return dateFormatter.format(t);
+  }
+}
+
+final timeFormatter = new DateFormat("HH:mm");
+
+String formatDateTime(DateTime t, Day today) {
+  final date = formatDate(t, today);
+  final time = timeFormatter.format(t) + " Uhr";
+  return date + ", " + time;
 }
 

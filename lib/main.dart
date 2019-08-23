@@ -58,6 +58,14 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _deleteEntry(int idx) {
+    setState(() {
+      _entries = _entries.filterIndexed((i, elem) {
+        return i != idx;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -93,9 +101,12 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Expanded(
-              child: ListWidget(entries: _entries, scrollController: _scrollController)
+              child: ListWidget(
+                entries: _entries,
+                scrollController: _scrollController,
+                deleteCallback: _deleteEntry)
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
             Input(
               callback: (entry) {
                 setState(() {
@@ -104,7 +115,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 WidgetsBinding.instance.addPostFrameCallback((d) {
                   _toEnd();
                 });
-                //Timer(Duration(milliseconds: 1000), () => _toEnd());
               }
             ),
             const SizedBox(height: 30),

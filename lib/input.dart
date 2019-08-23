@@ -1,15 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:quick_reminder/button.dart';
+import 'package:quick_reminder/types.dart';
 import "./buttonGroup.dart";
 
+typedef void InputCallback(ReminderEntry entry);
+
 class Input extends StatefulWidget {
-  Input({Key key}) : super(key: key);
+  final InputCallback callback;
+
+  Input({Key key, @required this.callback}) : super(key: key);
 
   @override
-  _Input createState() => _Input();
+  _Input createState() => _Input(callback);
 }
 
+List<Pair<String, Day>> makeDayList() {
+  var now = DateTime.now();
+  var today = Day.fromDateTime(now);
+  var weekday = now.weekday;
+  var result = [
+    Pair("heute", today),
+    Pair("morgen", today.addDays(1))
+  ];
+  void add(List<String> labels, int offset) {
+    for (var i = 0; i < labels.length; i++) {
+      result.add(Pair(labels[i], today.addDays(offset + i)));
+    }
+  }
+  switch (weekday) {
+    case DateTime.monday:
+        add(["Fr", "Sa", "So", "Mo"], 4);
+        break;
+    case DateTime.tuesday:
+        add(["Fr", "Sa", "So", "Mo"], 3);
+        break;
+    case DateTime.wednesday:
+        add(["Fr", "Sa", "So", "Mo"], 2);
+        break;
+    case DateTime.thursday:
+        add(["Sa", "So", "Mo", "Di"], 2);
+        break;
+    case DateTime.friday:
+        add(["So", "Mo", "Di", "Mi"], 2);
+        break;
+    case DateTime.saturday:
+        add(["Mo", "Di", "Mi", "Do"], 2);
+        break;
+    case DateTime.sunday:
+        add(["Di", "Mi", "Do", "Fr"], 2);
+        break;
+  }
+  return result;
+}
 
 class _Input extends State<Input> {
 
@@ -19,8 +62,19 @@ class _Input extends State<Input> {
   bool _textFocused;
   TextEditingController _controller;
   final FocusNode focusNode = FocusNode();
-  final List<String> dayButtons = ["heute", "morgen", "Fr", "Sa", "So", "Mo"];
-  final List<String> timeButtons = ["7:00", "11:00", "15:00", "19:00", "22:00"];
+
+  final List<Pair<String, Day>> dayButtons = makeDayList();
+  final List<Pair<String, TimeOfDay>> timeButtons =
+    [
+      Pair("7:00", TimeOfDay(hour: 7, minute: 0)),
+      Pair("11:00", TimeOfDay(hour: 11, minute: 0)),
+      Pair("15:00", TimeOfDay(hour: 15, minute: 0)),
+      Pair("19:00", TimeOfDay(hour: 19, minute: 0)),
+      Pair("22:00", TimeOfDay(hour: 22, minute: 0))
+    ];
+  final InputCallback callback;
+
+  _Input(this.callback);
 
   @override
   void initState() {
@@ -30,6 +84,24 @@ class _Input extends State<Input> {
     _explicitedDateTime = null;
     _textFocused = true;
     _controller = new TextEditingController();
+  }
+
+  Option<DateTime> getDateTime() {
+    if (_explicitedDateTime != null) {
+      return some(_explicitedDateTime);
+    } else if (_selectedDayIndex >= 0 && _selectedTimeIndex >= 0) {
+      var day = dayButtons[_selectedDayIndex].snd;
+      var time = timeButtons[_selectedTimeIndex].snd;
+      return some(day.toDateTime(time));
+    } else {
+      return none();
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
   }
 
   @override
@@ -55,8 +127,8 @@ class _Input extends State<Input> {
                 });
                 print("Button $index is now ${enabled ? 'enabled' : 'disabled'}");
               },
-              buttonAttributes: dayButtons.map((text) {
-                return new ButtonAttributes(text: text);
+              buttonAttributes: dayButtons.map((p) {
+                return new ButtonAttributes(text: p.fst);
               }).toList()
             ),
             const SizedBox(height: 12),
@@ -72,8 +144,8 @@ class _Input extends State<Input> {
                 });
                 print("Button $index is now ${enabled ? 'enabled' : 'disabled'}");
               },
-              buttonAttributes: timeButtons.map((text) {
-                return new ButtonAttributes(text: text);
+              buttonAttributes: timeButtons.map((p) {
+                return new ButtonAttributes(text: p.fst);
               }).toList()
             ),
           ]
@@ -132,13 +204,15 @@ class _Input extends State<Input> {
             ),
             FloatingActionButton(
               onPressed: () {
+                var title = _controller.text;
+                var entry = new ReminderEntry(title, getDateTime());
                 setState(() {
                   _explicitedDateTime = null;
                   _selectedDayIndex = -1;
                   _selectedTimeIndex = -1;
                   _controller.clear();
                 });
-                print("Pressed +");
+                callback(entry);
               },
               child: Icon(Icons.add),
               mini: true,

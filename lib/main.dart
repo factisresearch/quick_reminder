@@ -40,11 +40,22 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   KtList<ReminderEntry> _entries;
+  ScrollController _scrollController;
 
   @override
   void initState() {
     _entries = KtList.empty();
+    _scrollController = new ScrollController(
+      initialScrollOffset: 0.0,
+      keepScrollOffset: false,
+    );
     super.initState();
+  }
+
+  void _toEnd() {
+    _scrollController.jumpTo(
+      _scrollController.position.maxScrollExtent,
+    );
   }
 
   @override
@@ -82,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Expanded(
-              child: ListWidget(entries: _entries)
+              child: ListWidget(entries: _entries, scrollController: _scrollController)
             ),
             const SizedBox(height: 30),
             Input(
@@ -90,6 +101,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 setState(() {
                   _entries = _entries.plusElement(entry);
                 });
+                WidgetsBinding.instance.addPostFrameCallback((d) {
+                  _toEnd();
+                });
+                //Timer(Duration(milliseconds: 1000), () => _toEnd());
               }
             ),
             const SizedBox(height: 30),

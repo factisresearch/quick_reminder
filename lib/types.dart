@@ -38,7 +38,7 @@ class Option<T> {
 
   Option(this._value);
 
-  Option<U> map<U>(U fun(T)) {
+  Option<U> map<U>(U fun(T x)) {
     if (_value != null) {
       var res = fun(_value);
       if (res == null) {
@@ -50,7 +50,7 @@ class Option<T> {
     }
   }
 
-  void actOn(void fun(T)) {
+  void actOn(void fun(T x)) {
     if (_value != null) {
       fun(_value);
     }
@@ -67,6 +67,10 @@ class Option<T> {
       msg = msg ?? "Option is none";
       throw new AssertionError(msg);
     }
+  }
+
+  T toNullable() {
+    return _value;
   }
 }
 

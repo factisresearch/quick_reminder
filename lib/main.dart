@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quick_reminder/types.dart';
 import './input.dart';
 import "./listWidget.dart";
 import 'package:kt_dart/collection.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(QuickReminderApp());
 
-class MyApp extends StatelessWidget {
+class QuickReminderApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -25,20 +26,22 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: title),
+      home: QuickReminderMainWidget(title: title),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, @required this.title}) : super(key: key);
+class QuickReminderMainWidget extends StatefulWidget {
+  QuickReminderMainWidget({Key key, @required this.title}) : super(key: key);
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _QuickReminderMainWidgetState createState() => _QuickReminderMainWidgetState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _QuickReminderMainWidgetState extends State<QuickReminderMainWidget> {
+
+  static const platform = const MethodChannel('com.factisresearch/reminders');
 
   KtList<ReminderEntry> _entries;
   ScrollController _scrollController;
@@ -65,6 +68,22 @@ class _MyHomePageState extends State<MyHomePage> {
         return i != idx;
       });
     });
+  }
+
+  Future<void> _createReminder(ReminderEntry entry) async {
+    try {
+      List<dynamic> args = [entry.title];
+      entry.dateTime.actOn((x) {
+        var secs = x.millisecondsSinceEpoch / 1000;
+        args.add(secs);
+      });
+      await platform.invokeMethod(
+        'createReminder', args
+      );
+      print("Reminder created successfully");
+    } on PlatformException catch (e) {
+      print("Could not create reminder: " + e.toString());
+    }
   }
 
   @override
@@ -109,13 +128,14 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 10),
             Input(
-              callback: (entry) {
+              callback: (entry) async {
                 setState(() {
                   _entries = _entries.plusElement(entry);
                 });
                 WidgetsBinding.instance.addPostFrameCallback((d) {
                   _toEnd();
                 });
+                await _createReminder(entry);
               }
             ),
             const SizedBox(height: 30),

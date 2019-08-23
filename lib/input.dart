@@ -13,12 +13,24 @@ class Input extends StatefulWidget {
 
 class _Input extends State<Input> {
 
-  int _selectedDayIndex = -1;
-  int _selectedTimeIndex = -1;
-  DateTime _explicitedDateTime = null;
+  int _selectedDayIndex;
+  int _selectedTimeIndex;
+  DateTime _explicitedDateTime;
+  bool _textFocused;
+  TextEditingController _controller;
+  final FocusNode focusNode = FocusNode();
+  final List<String> dayButtons = ["heute", "morgen", "Fr", "Sa", "So", "Mo"];
+  final List<String> timeButtons = ["7:00", "11:00", "15:00", "19:00", "22:00"];
 
-  List<String> dayButtons = ["heute", "morgen", "Fr", "Sa", "So", "Mo"];
-  List<String> timeButtons = ["7:00", "11:00", "15:00", "19:00", "22:00"];
+  @override
+  void initState() {
+    super.initState();
+    _selectedDayIndex = -1;
+    _selectedTimeIndex = -1;
+    _explicitedDateTime = null;
+    _textFocused = true;
+    _controller = new TextEditingController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +44,7 @@ class _Input extends State<Input> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ButtonGroup(
+              selectedIndex: this._selectedDayIndex,
               callback: (index, enabled) {
                 setState(() {
                   if (enabled) {
@@ -48,6 +61,7 @@ class _Input extends State<Input> {
             ),
             const SizedBox(height: 12),
             ButtonGroup(
+              selectedIndex: this._selectedTimeIndex,
               callback: (index, enabled) {
                 setState(() {
                   if (enabled) {
@@ -65,7 +79,7 @@ class _Input extends State<Input> {
           ]
         );
     }
-    return Column(
+    var result = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -77,8 +91,11 @@ class _Input extends State<Input> {
             const SizedBox(width: 20),
             Button(
               buttonAttributes: new ButtonAttributes(text: ">>"),
-              callback: (bool enabled) {
-                DatePicker.showDateTimePicker(
+              callback: (bool enabled) async {
+                setState(() {
+                  _textFocused = false;
+                });
+                await DatePicker.showDateTimePicker(
                   context,
                   showTitleActions: true,
                   onConfirm: (date) {
@@ -90,6 +107,9 @@ class _Input extends State<Input> {
                   currentTime: DateTime.now(),
                   locale: LocaleType.de
                 );
+                setState(() {
+                  _textFocused = true;
+                });
               },
             )
           ]
@@ -104,6 +124,9 @@ class _Input extends State<Input> {
                   margin: const EdgeInsets.symmetric(horizontal: 5.0),
                   child: TextField(
                     cursorColor: Colors.black,
+                    focusNode: focusNode,
+                    autofocus: true,
+                    controller: _controller,
                   )
                 ),
             ),
@@ -113,6 +136,7 @@ class _Input extends State<Input> {
                   _explicitedDateTime = null;
                   _selectedDayIndex = -1;
                   _selectedTimeIndex = -1;
+                  _controller.clear();
                 });
                 print("Pressed +");
               },
@@ -123,5 +147,11 @@ class _Input extends State<Input> {
         )
       ]
     );
+    if (_textFocused) {
+      focusNode.requestFocus();
+    } else {
+      focusNode.unfocus();
+    }
+    return result;
   }
 }
